@@ -1,0 +1,1 @@
+### Just a simple poc for argocd practice
