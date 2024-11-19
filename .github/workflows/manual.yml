@@ -28,12 +28,13 @@ jobs:
     - name: Print the current working directory
       run: |
         pwd
-    # - name: Build Docker image from custom location
-    #   run: |
-    #     pwd
-    #     # Define the context directory where Dockerfile and app code are located
-    #     IMAGE_TAG=<your-docker-username>/django-app:${{ github.sha }}
-    #     DOCKER_CONTEXT=./  # Path to the directory containing your Dockerfile
+        ls
+        
+    - name: Build Docker image from custom location
+      run: |
+        # Define the context directory where Dockerfile and app code are located
+        IMAGE_TAG=ekstest/argocd:${{ github.sha }}
+        DOCKER_CONTEXT=./argoCDtest  # Path to the directory containing your Dockerfile
         
     #     # Build the Docker image from the specified context
     #     docker build -t $IMAGE_TAG $DOCKER_CONTEXT
