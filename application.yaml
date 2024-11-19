@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/v1pulsViewsoic/argocd-poc.git
     targetRevision: HEAD
-    path: main
+    path: main/k8s
   destination: 
     server: https://kubernetes.default.svc
     namespace: default
