@@ -39,9 +39,9 @@ jobs:
         #Build the Docker image from the specified context
         docker build -t $IMAGE_TAG $DOCKER_CONTEXT
     
-    # - name: Push Docker image to Docker Hub
-    #   run: |
-    #     docker push <your-docker-username>/django-app:${{ github.sha }}
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker push ekstest/argocd:${{ github.sha }}
 
     # - name: Update Kubernetes deployment with new image
     #   run: |
