@@ -25,9 +25,18 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # - name: Build Docker image
+    - name: Print the current working directory
+      run: |
+        pwd
+    # - name: Build Docker image from custom location
     #   run: |
-    #     docker build -t <your-docker-username>/django-app:${{ github.sha }} .
+    #     pwd
+    #     # Define the context directory where Dockerfile and app code are located
+    #     IMAGE_TAG=<your-docker-username>/django-app:${{ github.sha }}
+    #     DOCKER_CONTEXT=./  # Path to the directory containing your Dockerfile
+        
+    #     # Build the Docker image from the specified context
+    #     docker build -t $IMAGE_TAG $DOCKER_CONTEXT
     
     # - name: Push Docker image to Docker Hub
     #   run: |
