@@ -34,7 +34,7 @@ jobs:
       run: |
         # Define the context directory where Dockerfile and app code are located
         IMAGE_TAG=ekstest/argocd:${{ github.sha }}
-        DOCKER_CONTEXT=./argoCDtest/Dockerfile  # Path to the directory containing your Dockerfile
+        DOCKER_CONTEXT=./argoCDtest  # Path to the directory containing your Dockerfile
         
         #Build the Docker image from the specified context
         docker build -t $IMAGE_TAG $DOCKER_CONTEXT
