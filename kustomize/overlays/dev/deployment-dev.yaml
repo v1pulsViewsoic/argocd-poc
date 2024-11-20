@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+spec:
+  replicas: 2 # Update the replica count to 2 for dev env
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    spec:
+      containers:
+      - name: django-app
