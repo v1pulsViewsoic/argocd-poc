@@ -29,49 +29,27 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Your Slack webhook URL secret
 
     steps:
-    - name: Send Slack Notification with Block Kit
+    - name: Send Slack Notification with Commit Button
       uses: act10ns/slack@v1
       with:
-        status: ${{ needs.build-and-deploy.result }} # Pass job result to Slack action
+        status: ${{ needs.build-and-deploy.result }}
         channel: '#tarun-test'
-        # Define the Slack message using Block Kit JSON
+        # Using 'blocks' for a mix of text and button
         blocks: |
           [
-            # --- Status Header Block ---
-            {
-              "type": "header",
-              "text": {
-                "type": "plain_text",
-                "text": "${{ (needs.build-and-deploy.result == 'success' && '✅ Deployment Succeeded') || (needs.build-and-deploy.result == 'failure' && '❌ Deployment Failed') || '⚠️ Deployment Status: ${{ needs.build-and-deploy.result }}' }}"
-              }
-            },
-            # --- Details Section ---
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "*Repository:*\n<https://github.com/${{ github.repository }}|${{ github.repository }}>"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "*Triggered by:*\n`${{ github.actor }}`"
-                }
-              ]
-            },
-            # --- Visual Separator ---
-            {
-              "type": "divider"
-            },
-            # --- Commit Message / PR Title Section ---
+            # --- Main Message Text (in a section block) ---
             {
               "type": "section",
               "text": {
                 "type": "mrkdwn",
-                "text": "*Commit / PR Title:*\n```\n${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}\n```"
+                "text": |
+                  ${{ github.actor }}
+                  ${{ (needs.build-and-deploy.result == 'success' && '✅') || (needs.build-and-deploy.result == 'failure' && '❌') || '⚠️' }} Deployment Status: *${{ needs.build-and-deploy.result }}*
+                  📝 Commit: `${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}`
+                  🧑‍💻 Triggered by: `${{ github.actor }}`
               }
             },
-            # --- Action Buttons Section ---
+            # --- Commit ID Button ---
             {
               "type": "actions",
               "elements": [
@@ -85,25 +63,16 @@ jobs:
                   # Button style changes based on job result
                   "style": "${{ (needs.build-and-deploy.result == 'success' && 'primary') || 'danger' }}",
                   "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-                },
-                {
-                  "type": "button",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "View Workflow Run",
-                    "emoji": true
-                  },
-                  "url": "https://github.com/${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                 }
               ]
             },
-            # --- Context / Footer Section ---
+            # --- Footer Context ---
             {
               "type": "context",
               "elements": [
                 {
                   "type": "mrkdwn",
-                  "text": "Workflow: ${{ github.workflow }} | Run ID: ${{ github.run_id }} | Time: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || 'N/A' }}"
+                  "text": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.repository }}#${{ github.run_number }}> | ${{ github.run_started_at }}"
                 }
               ]
             }
