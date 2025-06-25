@@ -42,5 +42,6 @@ jobs:
         message: >
           🚀 Starting Deployment...
           📝 Commit: ${{ github.event.head_commit.message || github.event.pull_request.title }}
+          🔗 Commit: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
       if: always()
  
