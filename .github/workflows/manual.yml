@@ -34,9 +34,10 @@ jobs:
       with:
         status: ${{ needs.build-and-deploy.result }} # Pass job result to Slack action
         channel: '#tarun-test'
-        # Use Block Kit for rich formatting
+        # Define the Slack message using Block Kit JSON
         blocks: |
           [
+            # --- Status Header Block ---
             {
               "type": "header",
               "text": {
@@ -44,6 +45,7 @@ jobs:
                 "text": "${{ (needs.build-and-deploy.result == 'success' && '✅ Deployment Succeeded') || (needs.build-and-deploy.result == 'failure' && '❌ Deployment Failed') || '⚠️ Deployment Status: ${{ needs.build-and-deploy.result }}' }}"
               }
             },
+            # --- Details Section ---
             {
               "type": "section",
               "fields": [
@@ -57,13 +59,19 @@ jobs:
                 }
               ]
             },
+            # --- Visual Separator ---
+            {
+              "type": "divider"
+            },
+            # --- Commit Message / PR Title Section ---
             {
               "type": "section",
               "text": {
                 "type": "mrkdwn",
-                "text": "*Commit Message:*\n`{{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}`"
+                "text": "*Commit / PR Title:*\n```\n${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}\n```"
               }
             },
+            # --- Action Buttons Section ---
             {
               "type": "actions",
               "elements": [
@@ -74,6 +82,7 @@ jobs:
                     "text": "View Commit Details",
                     "emoji": true
                   },
+                  # Button style changes based on job result
                   "style": "${{ (needs.build-and-deploy.result == 'success' && 'primary') || 'danger' }}",
                   "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
                 },
@@ -88,12 +97,13 @@ jobs:
                 }
               ]
             },
+            # --- Context / Footer Section ---
             {
               "type": "context",
               "elements": [
                 {
                   "type": "mrkdwn",
-                  "text": "Workflow: ${{ github.workflow }} | Run ID: ${{ github.run_id }}"
+                  "text": "Workflow: ${{ github.workflow }} | Run ID: ${{ github.run_id }} | Time: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || 'N/A' }}"
                 }
               ]
             }
