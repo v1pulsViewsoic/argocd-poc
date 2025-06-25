@@ -16,18 +16,22 @@ jobs:
 
     steps:
     - name: Check out repository
-      uses: actions/checkout@v2asasas
+      uses: actions/checkout@v2
+      continue-on-error: true  # Don't stop the job on failure
 
-    # Your other build or deploy steps here...
-
+    - name: Simulate build step
+      run: |
+        echo "🔧 Simulating build step"
+        exit 1  # Fail intentionally for demo
 
     - name: Slack Notification (final status)
-      if: always()
+      if: always()  # Ensure this runs regardless of failure
       uses: act10ns/slack@v1
       with:
         status: ${{ job.status }}
         channel: '#tarun-test'
         message: >
-          📝 Commit: ${{ github.event.head_commit.message || github.event.pull_request.title }}
-          🔗 Commit: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
-          🧑‍💻 Triggered by: `${{ github.actor }}`
+          ⚠️ *Deployment Status*: `${{ job.status }}`
+          📝 *Commit*: ${{ github.event.head_commit.message || github.event.pull_request.title }}
+          🔗 *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
+          🧑‍💻 *Triggered by*: `${{ github.actor }}`
