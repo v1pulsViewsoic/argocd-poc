@@ -29,10 +29,10 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Your Slack webhook URL secret
 
     steps:
-    - name: Send Slack Notification with Commit Button
+    - name: Send Slack Notification with Custom Content
       uses: act10ns/slack@v1
       with:
-        status: ${{ needs.build-and-deploy.result }}
+        # IMPORTANT: Removed the 'status' input to gain full control over the message.
         channel: '#tarun-test'
         # Using 'blocks' for a mix of text and button
         blocks: |
