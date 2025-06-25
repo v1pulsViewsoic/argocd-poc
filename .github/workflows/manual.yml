@@ -33,7 +33,7 @@ jobs:
         status: ${{ needs.build-and-deploy.result }}
         channel: '#tarun-test'
         message: >
-          ⚠️ *Deployment Status*: `${{ needs.build-and-deploy.result }}`
+          ${{ (needs.build-and-deploy.result == 'success' && '✅') || '⚠️' }} *Deployment Status*: `${{ needs.build-and-deploy.result }}`
           📝 *Commit*: ${{ github.event.head_commit.message || github.event.pull_request.title }}
           🔗 *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
           🧑‍💻 *Triggered by*: `${{ github.actor }}`
