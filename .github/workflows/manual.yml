@@ -17,23 +17,84 @@ jobs:
 
     - name: Simulate build step
       run: |
-        echo "🔧 Simulating build step"
-      # exit 1  # Simulate failure
+        echo "🔧 Simulating build step..."
+        # Uncomment the line below to simulate a build failure:
+        # exit 1
 
   notify-slack:
     runs-on: ubuntu-latest
-    needs: build-and-deploy  # Run after build job
-    if: always()  # Run even if build failed
+    needs: build-and-deploy  # Ensure this job runs after 'build-and-deploy'
+    if: always()             # Ensures notification is sent even if 'build-and-deploy' fails
     env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Your Slack webhook URL secret
+
     steps:
-    - name: Send Slack Notification
+    - name: Send Slack Notification with Block Kit
       uses: act10ns/slack@v1
       with:
-        status: ${{ needs.build-and-deploy.result }}
+        status: ${{ needs.build-and-deploy.result }} # Pass job result to Slack action
         channel: '#tarun-test'
-        message: >
-          ${{ (needs.build-and-deploy.result == 'success' && '✅') || '⚠️' }} *Deployment Status*: `${{ needs.build-and-deploy.result }}`
-          📝 *Commit*: ${{ github.event.head_commit.message || github.event.pull_request.title }}
-          🔗 *Commit*: <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
-          🧑‍💻 *Triggered by*: `${{ github.actor }}`
+        # Use Block Kit for rich formatting
+        blocks: |
+          [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "${{ (needs.build-and-deploy.result == 'success' && '✅ Deployment Succeeded') || (needs.build-and-deploy.result == 'failure' && '❌ Deployment Failed') || '⚠️ Deployment Status: ${{ needs.build-and-deploy.result }}' }}"
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Repository:*\n<https://github.com/${{ github.repository }}|${{ github.repository }}>"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Triggered by:*\n`${{ github.actor }}`"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "*Commit Message:*\n`{{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}`"
+              }
+            },
+            {
+              "type": "actions",
+              "elements": [
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "View Commit Details",
+                    "emoji": true
+                  },
+                  "style": "${{ (needs.build-and-deploy.result == 'success' && 'primary') || 'danger' }}",
+                  "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+                },
+                {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "View Workflow Run",
+                    "emoji": true
+                  },
+                  "url": "https://github.com/${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }
+              ]
+            },
+            {
+              "type": "context",
+              "elements": [
+                {
+                  "type": "mrkdwn",
+                  "text": "Workflow: ${{ github.workflow }} | Run ID: ${{ github.run_id }}"
+                }
+              ]
+            }
+          ]
