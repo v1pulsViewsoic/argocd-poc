@@ -18,7 +18,7 @@ jobs:
     - name: Simulate build step
       run: |
         echo "🔧 Simulating build step"
-        exit 1  # Simulate failure
+      # exit 1  # Simulate failure
 
   notify-slack:
     runs-on: ubuntu-latest
