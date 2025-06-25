@@ -39,8 +39,8 @@ jobs:
       with: 
         status: starting
         channel: '#tarun-test'
-        message: |
-        🚀 Starting Deployment...
-        📝 Commit Message: ${{ github.event.head_commit.message }}
+        message: >
+          🚀 Starting Deployment...
+          📝 Commit: ${{ github.event.head_commit.message || github.event.pull_request.title }}
       if: always()
  
