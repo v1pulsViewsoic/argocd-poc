@@ -24,30 +24,17 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     - name: Print the current working directory
       run: |
         pwd
         ls
-        
-    - name: Build Docker image from custom location
-      run: |
-        # Define the context directory where Dockerfile and app code are located
-        IMAGE_TAG=ekstest/argocd:${{ github.sha }}
-        DOCKER_CONTEXT=./argoCDtest  # Path to the directory containing your Dockerfile
-        
-        #Build the Docker image from the specified context
-        docker build -t $IMAGE_TAG $DOCKER_CONTEXT
     
-    - name: Push Docker image to Docker Hub
-      run: |
-        docker push ekstest/argocd:${{ github.sha }}
-
-    # - name: Update Kubernetes deployment with new image
-    #   run: |
-    #     kubectl set image deployment/django-app django=<your-docker-username>/django-app:${{ github.sha }} -n default
-    #     kubectl rollout status deployment/django-app -n default
-
-    # - name: Sync ArgoCD Application
-    #   run: |
-    #     argocd app sync django-app --auth-token ${{ secrets.ARGOCD_AUTH_TOKEN }}
+    - name: Slack Notification
+      uses: act10ns/slack@v1
+      with: 
+        status: starting
+        channel: '#tarun-test'
+        message: Starting Deployment...
+      if: always()
