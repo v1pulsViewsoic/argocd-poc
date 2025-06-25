@@ -15,41 +15,44 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v2
 
-    - name: Simulate build step
+    - name: Simulate build
       run: |
-        echo "🔧 Simulating build step..."
-        # Uncomment the line below to simulate a build failure:
-        # exit 1
+        echo "Simulating successful build"
+        # exit 1  # Uncomment this to simulate failure
 
   notify-slack:
     runs-on: ubuntu-latest
-    needs: build-and-deploy  # Ensure this job runs after 'build-and-deploy'
-    if: always()             # Ensures notification is sent even if 'build-and-deploy' fails
+    needs: build-and-deploy
+    if: always()
     env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Your Slack webhook URL secret
-
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-    - name: Send Slack Notification with Custom Content
-      uses: act10ns/slack@v1
-      with:
-        # IMPORTANT: Removed the 'status' input to gain full control over the message.
-        channel: '#tarun-test'
-        # Using 'blocks' for a mix of text and button
-        blocks: |
-          [
-            # --- Main Message Text (in a section block) ---
+    - name: Send Slack Notification with Button
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data @- "$SLACK_WEBHOOK_URL" <<EOF
+        {
+          "blocks": [
             {
-              "type": "section",
+              "type": "header",
               "text": {
-                "type": "mrkdwn",
-                "text": |
-                  ${{ github.actor }}
-                  ${{ (needs.build-and-deploy.result == 'success' && '✅') || (needs.build-and-deploy.result == 'failure' && '❌') || '⚠️' }} Deployment Status: *${{ needs.build-and-deploy.result }}*
-                  📝 Commit: `${{ github.event.head_commit.message || github.event.pull_request.title || 'N/A' }}`
-                  🧑‍💻 Triggered by: `${{ github.actor }}`
+                "type": "plain_text",
+                "text": "${{ needs.build-and-deploy.result == 'success' && '✅ Deployment Succeeded' || '⚠️ Deployment Failed' }}",
+                "emoji": true
               }
             },
-            # --- Commit ID Button ---
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Commit Message:*\n${{ github.event.head_commit.message || github.event.pull_request.title }}"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Triggered By:*\n${{ github.actor }}"
+                }
+              ]
+            },
             {
               "type": "actions",
               "elements": [
@@ -57,23 +60,13 @@ jobs:
                   "type": "button",
                   "text": {
                     "type": "plain_text",
-                    "text": "View Commit Details",
+                    "text": "🔗 View Commit",
                     "emoji": true
                   },
-                  # Button style changes based on job result
-                  "style": "${{ (needs.build-and-deploy.result == 'success' && 'primary') || 'danger' }}",
                   "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-                }
-              ]
-            },
-            # --- Footer Context ---
-            {
-              "type": "context",
-              "elements": [
-                {
-                  "type": "mrkdwn",
-                  "text": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.repository }}#${{ github.run_number }}> | ${{ github.run_started_at }}"
                 }
               ]
             }
           ]
+        }
+        EOF
