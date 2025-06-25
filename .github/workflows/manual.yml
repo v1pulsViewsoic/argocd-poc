@@ -23,6 +23,7 @@ jobs:
       run: |
         echo "🔧 Simulating build step"
         exit 1  # Fail intentionally for demo
+      continue-on-error: true
 
     - name: Slack Notification (final status)
       if: always()  # Ensure this runs regardless of failure
