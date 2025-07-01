@@ -3,4 +3,6 @@ kind: ConfigMap
 metadata:
   name: argocd-notifications-cm
 data:
-  service.teams: "recipientUrls: \n  opsgenie-test: $channel-teams-url\n"
+  service.teams: |
+    recipientUrls:
+      opsgenie-test: $channel-teams-url
