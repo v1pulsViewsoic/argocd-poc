@@ -4,8 +4,8 @@ metadata:
   name: django-argo-application
   namespace: argocd
   annotations:
-    notifications.argoproj.io/subscribe.on-sync-succeeded.teams: opsgenie-test #Teams Channel
-    notifications.argoproj.io/subscribe.on-sync-failed.teams: opsgenie-test #Teams Channel         
+    notifications.argoproj.io/subscribe.on-sync-succeeded.teams: opsgenie-test
+    # notifications.argoproj.io/subscribe.on-sync-failed.teams: opsgenie-test       
 spec:
   project: default
   source:
