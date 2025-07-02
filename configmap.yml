@@ -9,7 +9,9 @@ data:
   
   service.teams: |
     recipientUrls:
-      opsgenie-test: $channel-teams-url # Correctly referencing the secret
+      opsgenie-test: $channel-teams-url
+  service.slack: |
+    token: $slack-token
 
   # --- Triggers (Each trigger gets its own top-level key) ---
 
@@ -18,6 +20,7 @@ data:
     - description: Application sync succeeded
       send:
         - sync-succeeded
+        - on-sync-succeeded.slack
       when: app.status.sync.status == 'Synced' and app.status.health.status == 'Healthy'
 
   trigger.on-sync-failed: |
@@ -85,3 +88,21 @@ data:
           }]
         }]
       title: Application {{.app.metadata.name}} Sync Failed
+
+  template.on-sync-succeeded.slack: |
+      slack:
+        attachments: |
+          [{
+            "title": "{{.app.metadata.name}}",
+            "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+            "color": "#18be52",
+            "fields": [{
+              "title": "Sync Status",
+              "value": "{{.app.status.sync.status}}",
+              "short": true
+            }, {
+              "title": "Repository",
+              "value": "{{.app.spec.source.repoURL}}",
+              "short": true
+            }]
+          }]

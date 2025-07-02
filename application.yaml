@@ -1,23 +1,24 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: django-argo-application
-  namespace: argocd
-  annotations:
-    notifications.argoproj.io/subscribe.on-sync-succeeded.teams: opsgenie-test
-    notifications.argoproj.io/subscribe.on-sync-failed.teams: opsgenie-test       
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/v1pulsViewsoic/argocd-poc.git
-    targetRevision: main  # This is the branch
-    path: k8s
-  destination: 
-    server: https://kubernetes.default.svc
-    namespace: default
-  syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-    automated:
-      selfHeal: true
-      prune: true
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: django-argo-application
+    namespace: argocd
+    annotations:
+      notifications.argoproj.io/subscribe.on-sync-succeeded.teams: opsgenie-test
+      notifications.argoproj.io/subscribe.on-sync-failed.teams: opsgenie-test
+      notifications.argoproj.io/subscribe.on-sync-succeeded.slack: tarun-test
+  spec:
+    project: default
+    source:
+      repoURL: https://github.com/v1pulsViewsoic/argocd-poc.git
+      targetRevision: main  # This is the branch
+      path: k8s
+    destination: 
+      server: https://kubernetes.default.svc
+      namespace: default
+    syncPolicy:
+      syncOptions:
+      - CreateNamespace=true
+      automated:
+        selfHeal: true
+        prune: true
