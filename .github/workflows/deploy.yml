@@ -12,3 +12,8 @@ jobs:
 
       - name: Deploy to server
         run: echo "Pretend deploying to server here"
+      
+      - name: Simulate build
+        run: |
+          echo "Simulating successful build"
+          exit 1  # Uncomment this to simulate failure

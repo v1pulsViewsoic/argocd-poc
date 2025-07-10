@@ -14,7 +14,7 @@ jobs:
       - name: Simulate build
         run: |
           echo "Simulating successful build"
-          exit 1  # Uncomment this to simulate failure
+          exit 0  # Uncomment this to simulate failure
 
       - name: Build Docker image (no push)
         uses: docker/build-push-action@v5
