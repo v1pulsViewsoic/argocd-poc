@@ -42,4 +42,4 @@ jobs:
           EOF
           )
 
-          curl -H "Content-Type: application/json" -d "${PAYLOAD}" "$TEAMS_WEBHOOK_URL"
+          curl -H "Content-Type: application/json" -d "${PAYLOAD}" "$asasaTEAMS_WEBHOOK_URL"
