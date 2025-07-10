@@ -1,0 +1,45 @@
+name: Notify
+
+on:
+  workflow_run:
+    workflows:
+      - Build
+      - Deploy
+    types:
+      - completed
+
+jobs:
+  notify-teams:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification to Microsoft Teams
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          STATUS: ${{ github.event.workflow_run.conclusion }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          TRIGGER: ${{ github.event.workflow_run.actor.login }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          # Set emoji based on status
+          if [ "$STATUS" = "success" ]; then
+            ICON="✅ SUCCESS"
+          elif [ "$STATUS" = "failure" ]; then
+            ICON="❌ FAILURE"
+          else
+            ICON="⚠️ $STATUS"
+          fi
+
+          PAYLOAD=$(cat <<EOF
+          {
+            "@type": "MessageCard",
+            "@context": "http://schema.org/extensions",
+            "summary": "GitHub Actions Notification",
+            "themeColor": "0076D7",
+            "title": "GitHub Actions Pipeline Status",
+            "text": "**Workflow**: \`$WORKFLOW\`\n**Repository**: \`${{ github.repository }}\`\n**Branch**: \`$BRANCH\`\n**Triggered by**: \`$TRIGGER\`\n\n**Status**: $ICON\n\n[View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/$RUN_ID)"
+          }
+          EOF
+          )
+
+          curl -H "Content-Type: application/json" -d "${PAYLOAD}" "$TEAMS_WEBHOOK_URL"
