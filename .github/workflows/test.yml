@@ -12,12 +12,12 @@ jobs:
       - name: Dummy deploy
         run: echo "Deploying......."
 
-  notify:
-    uses: ./.github/workflows/notify.yml
-    needs: deploy
-    with:
-      status: success
-      workflow: Trigger notification
-      branch: main
-      actor: ${{ github.actor }}
-      run_id: ${{ github.run_id }}
+  # notify:
+  #   uses: ./.github/workflows/notify.yml
+  #   needs: deploy
+  #   with:
+  #     status: success
+  #     workflow: Trigger notification
+  #     branch: main
+  #     actor: ${{ github.actor }}
+  #     run_id: ${{ github.run_id }}
