@@ -3,7 +3,7 @@ name: Trigger notification
 on:
   push:
     branches:
-      - feat/notifications
+      - main
 
 jobs:
   deploy:
@@ -18,6 +18,6 @@ jobs:
     with:
       status: success
       workflow: Trigger notification
-      branch: feat/notifications
+      branch: main
       actor: ${{ github.actor }}
       run_id: ${{ github.run_id }}
