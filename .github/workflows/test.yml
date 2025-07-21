@@ -1,14 +1,23 @@
-name: Test
+name: Trigger notification
 
 on:
-  pull_request:
+  push:
+    branches:
+      - feat/notifications
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Dummy deploy
+        run: echo "Deploying..."
 
-      - name: Run tests
-        run: echo "Running tests here"
+  notify:
+    uses: ./.github/workflows/notify.yml
+    needs: deploy
+    with:
+      status: success
+      workflow: Trigger notification
+      branch: feat/notifications
+      actor: ${{ github.actor }}
+      run_id: ${{ github.run_id }}

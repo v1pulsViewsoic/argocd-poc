@@ -1,12 +1,23 @@
 name: Notify
 
 on:
-  workflow_run:
-    workflows:
-      - Build
-      - Deploy
-    types:
-      - completed
+  workflow_call:
+    inputs:
+      status:
+        required: true
+        type: string
+      workflow:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+      actor:
+        required: true
+        type: string
+      run_id:
+        required: true
+        type: string
 
 jobs:
   notify-teams:
@@ -15,13 +26,20 @@ jobs:
       - name: Send notification to Microsoft Teams
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          STATUS: ${{ github.event.workflow_run.conclusion }}
-          WORKFLOW: ${{ github.event.workflow_run.name }}
-          BRANCH: ${{ github.event.workflow_run.head_branch }}
-          TRIGGER: ${{ github.event.workflow_run.actor.login }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
+          STATUS: ${{ inputs.status }}
+          WORKFLOW: ${{ inputs.workflow }}
+          BRANCH: ${{ inputs.branch }}
+          TRIGGER: ${{ inputs.actor }}
+          RUN_ID: ${{ inputs.run_id }}
         run: |
-          # Set emoji based on status
+          echo "🔧 Debugging Variables:"
+          echo "STATUS: $STATUS"
+          echo "WORKFLOW: $WORKFLOW"
+          echo "BRANCH: $BRANCH"
+          echo "TRIGGER: $TRIGGER"
+          echo "RUN_ID: $RUN_ID"
+          echo "TEAMS_WEBHOOK_URL: $TEAMS_WEBHOOK_URL"
+
           if [ "$STATUS" = "success" ]; then
             ICON="✅ SUCCESS"
           elif [ "$STATUS" = "failure" ]; then
@@ -42,4 +60,8 @@ jobs:
           EOF
           )
 
-          curl -H "Content-Type: application/json" -d "${PAYLOAD}" "$asasaTEAMS_WEBHOOK_URL"
+          echo "📦 Payload:"
+          echo "$PAYLOAD"
+
+          echo "🚀 Sending payload to Teams..."
+          curl -H "Content-Type: application/json" -d "${PAYLOAD}" "$TEAMS_WEBHOOK_URL"
