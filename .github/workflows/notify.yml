@@ -11,21 +11,22 @@ jobs:
       - name: Send notification to Microsoft Teams
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          STATUS: ${{ github.event.workflow_run.conclusion }}
-          WORKFLOW: ${{ github.event.workflow_run.name }}
-          BRANCH: ${{ github.event.workflow_run.head_branch }}
-          TRIGGER: ${{ github.event.workflow_run.actor.login }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
+          STATUS: "manual dispatch"
+          WORKFLOW: ${{ github.workflow }}
+          BRANCH: ${{ github.ref_name }}
+          TRIGGER: ${{ github.actor }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          # Set emoji based on status
-          if [ "$STATUS" = "success" ]; then
-            ICON="✅ SUCCESS"
-          elif [ "$STATUS" = "failure" ]; then
-            ICON="❌ FAILURE"
-          else
-            ICON="⚠️ $STATUS"
-          fi
- 
+          echo "🔧 Debugging Variables:"
+          echo "STATUS: $STATUS"
+          echo "WORKFLOW: $WORKFLOW"
+          echo "BRANCH: $BRANCH"
+          echo "TRIGGER: $TRIGGER"
+          echo "RUN_ID: $RUN_ID"
+          echo "TEAMS_WEBHOOK_URL: $TEAMS_WEBHOOK_URL"
+
+          ICON="🚀 $STATUS"
+
           PAYLOAD=$(cat <<EOF
           {
             "@type": "MessageCard",
@@ -37,5 +38,9 @@ jobs:
           }
           EOF
           )
- 
-          curl -H "Content-Type: application/json" -d "${PAYLOAD}" "$TEAMS_WEBHOOK_URL"
+
+          echo "📦 Payload:"
+          echo "$PAYLOAD"
+          echo "🚀 Sending payload to Teams..."
+
+          curl -H "Content-Type: application/json" -d "$PAYLOAD" "$TEAMS_WEBHOOK_URL"
